@@ -10,7 +10,9 @@ os.environ["PATH"] += os.pathsep + 'C:/Program Files (x86)/Graphviz2.38/bin/'
 This path is nothing but where you have downloaded.
 5. RESTART Spyder and thing should work.
 
-As a reference: https://stackoverflow.com/questions/18438997/why-is-pydot-unable-to-find-graphvizs-executables-in-windows-8
+As a reference: 
+https://stackoverflow.com/questions/26349314/how-can-i-use-conda-to-install-pydot
+https://stackoverflow.com/questions/18438997/why-is-pydot-unable-to-find-graphvizs-executables-in-windows-8
 
 Thanks
 Sreeni Jilla
