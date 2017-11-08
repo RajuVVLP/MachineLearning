@@ -12,6 +12,7 @@ This path is nothing but where you have downloaded.
 
 As a reference: 
 https://stackoverflow.com/questions/26349314/how-can-i-use-conda-to-install-pydot
+Alternatively you can say pip - install
 https://stackoverflow.com/questions/18438997/why-is-pydot-unable-to-find-graphvizs-executables-in-windows-8
 
 Thanks
