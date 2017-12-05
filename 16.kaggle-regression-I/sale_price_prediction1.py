@@ -1,14 +1,15 @@
 #Regression - House sale price prediction
-
 import os
 import pandas as pd
 from sklearn import tree
 from sklearn import metrics
+#from sklearn import linear_model
 from sklearn import model_selection
 import numpy as np
 import io
-#import pydot
+import pydot
 import math
+import seaborn as sns
 
 #returns current working directory
 os.getcwd()
@@ -23,6 +24,7 @@ house_test = pd.read_csv("house_test.csv")
 house_test.shape
 house_test.info()
 
+#Concatenate train and test data and we will seperate before applying the model
 house_data = pd.concat([house_train, house_test],ignore_index=True)
 house_data.drop(["Id","SalePrice"], 1, inplace=True)
 house_data.shape
@@ -40,25 +42,48 @@ for feature in ordinal_features1:
     house_data.loc[null_idx, feature] = None 
     house_data[feature] = house_data[feature].map(quality_dict)
 
+house_train.head(10)
 
 #handle missing data columns
+#See for how many rows the data is missing!
 total_missing = house_data.isnull().sum()
+
+#for just dry run, go ahead and delete where the data is missing.
+#This is just for a dry run to understand the next steps.
+#in reality, we have impute these values
 to_delete = total_missing[total_missing>0]
 house_data.drop(list(to_delete.index), axis=1, inplace=True)
 house_data.shape
 
+#Numerical columns.. include=['number']
 numeric_cols = house_data.select_dtypes(include=['number']).columns
+#Categorical columns .. exclude = ['number'])
 cat_cols = house_data.select_dtypes(exclude = ['number']).columns
 
+#Automated to get all category columns and use one hot encoding instead of writing each and every column
 house_data1 = pd.get_dummies(house_data, columns=cat_cols)
 house_data1.shape
 
+#Plot my sale price
+x = house_train['SalePrice']
+sns.distplot(x, kde=False)
+
+
+#splitting train data as conctenated in the begining
 house_train1 = house_data1[:house_train.shape[0]]
+#splitting test data as conctenated in the begining
 house_test1 = house_data1[house_train.shape[0]:]
+
+
+#Smooting the values. As the sale price is big
 house_train['log_sale_price'] = np.log(house_train['SalePrice'])
 
+#See how the data looks like with log values.
+x=house_train['log_sale_price']
+sns.distplot(x,kde=False)
+
 X_train = house_train1
-y_train = house_train['log_sale_price']
+y_train = house_train['SalePrice']
 
 
 dt_estimator = tree.DecisionTreeRegressor(random_state=2017)
@@ -75,16 +100,16 @@ def rmse(y_original,  y_pred):
       
 res = model_selection.cross_val_score(dt_estimator, X_train, y_train, cv=10,scoring=metrics.make_scorer(rmse)).mean()
 
-
 dt_estimator.fit(X_train, y_train)
 dt_estimator.feature_importances_
 
 dot_data = io.StringIO() 
 tree.export_graphviz(dt_estimator, out_file = dot_data, feature_names = X_train.columns)
-graph = pydot.graph_from_dot_data(dot_data.getvalue())[0] 
+graph = pydot.graph_from_dot_data(dot_data.getvalue())
 graph.write_pdf("reg-tree1.pdf")
 
 X_test = house_test1
 log_sales_price = dt_estimator.predict(X_test)
+#convert log values back to orignal values by using exponential loss
 house_test['SalePrice'] = np.exp(log_sales_price)
 house_test.to_csv("submission.csv", columns=['Id','SalePrice'], index=False)
