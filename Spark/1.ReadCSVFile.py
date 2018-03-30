@@ -1,10 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Wed Dec 20 12:52:15 2017
-
-@author: ravikishore.ch
-"""
-
 
 import os
 import inspect
